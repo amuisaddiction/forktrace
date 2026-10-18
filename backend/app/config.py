@@ -23,6 +23,10 @@ class Settings:
         self.falkordb_username: str = os.getenv("FALKORDB_USERNAME", "")
         self.falkordb_password: str = os.getenv("FALKORDB_PASSWORD", "")
         self.falkordb_graph: str = os.getenv("FALKORDB_GRAPH", "forktrace")
+        self.test_graph_name: str = os.getenv(
+            "FALKORDB_TEST_GRAPH",
+            os.getenv("TEST_GRAPH_NAME", "forktrace_test"),
+        )
 
         ssl_val = os.getenv("FALKORDB_SSL", "false").strip().lower()
         self.falkordb_ssl: bool = ssl_val in ("true", "1", "yes", "t")

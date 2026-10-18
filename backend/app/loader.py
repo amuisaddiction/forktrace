@@ -3,12 +3,19 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 def wipe_graph(graph) -> None:
-    """Wipe all nodes and edges from the graph."""
+    """Wipe all nodes and edges from the graph, including RecallAction audit nodes."""
+    try:
+        graph.query("MATCH (ra:RecallAction) DETACH DELETE ra")
+    except Exception:
+        pass
     try:
         graph.delete()
     except Exception:
-        # Fallback to cypher delete if graph.delete() is unsupported or fails
+        pass
+    try:
         graph.query("MATCH (n) DETACH DELETE n")
+    except Exception:
+        pass
 
 def load_scenario(graph, data: Dict[str, Any]) -> Dict[str, int]:
     """Wipe and reload the graph from scenario data using parameterized Cypher.

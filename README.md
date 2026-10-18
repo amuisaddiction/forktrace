@@ -266,6 +266,7 @@ FALKORDB_USERNAME=falkordb
 FALKORDB_PASSWORD=your_password
 FALKORDB_SSL=false
 FALKORDB_GRAPH=forktrace
+FALKORDB_TEST_GRAPH=forktrace_test
 DEMO_MODE=true
 ```
 
@@ -280,6 +281,7 @@ FALKORDB_HOST=localhost
 FALKORDB_PORT=6379
 FALKORDB_SSL=false
 FALKORDB_GRAPH=forktrace
+FALKORDB_TEST_GRAPH=forktrace_test
 DEMO_MODE=true
 ```
 
@@ -344,3 +346,4 @@ The test suite contains 40 tests covering every layer of the product:
 
 **Current Architecture (Phase 1):**  
 ForkTrace operates as a **deterministic, graph-powered algorithmic pipeline**. It executes real Cypher queries in FalkorDB, performs pure mathematical epidemiological scoring, and partitions hypotheses via set logic. There is **no LLM making autonomous runtime tool selections** in the core investigation. The system's intelligence derives from graph multi-hop topology, Cypher inference rules, and mathematical epidemiology. (An optional LLM-assisted tool-calling layer is slated for Phase 2).
+

@@ -37,8 +37,14 @@ def remove_shipment(batch_id: str, place_id: str, graph=None) -> int:
 
 
 def reset(graph=None) -> Dict[str, int]:
-    """Restore the FalkorDB graph to the pristine seeded state from scenario.json."""
+    """Restore the FalkorDB graph to the pristine seeded state from scenario.json,
+    explicitly removing any simulated RecallAction nodes as well.
+    """
     g = graph if graph is not None else get_graph()
+    try:
+        g.query("MATCH (ra:RecallAction) DETACH DELETE ra")
+    except Exception:
+        pass
     return load_from_file(g, settings.scenario_path)
 
 

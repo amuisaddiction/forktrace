@@ -129,14 +129,25 @@ def test_api_demo_mutation_and_reset(client: TestClient, scenario_data: dict, gr
         assert r3_scope is not None
         assert r3_scope["reason"] == "kitchen records show this batch, but the shipment record is missing"
 
-        # 3. Reset via API endpoint
+        # 3. Create a simulated RecallAction before reset
+        rec_resp = client.post(
+            "/recall/approve",
+            json={"batch_id": planted, "approved_by": "Test Auditor", "notes": "Pre-reset recall test"},
+        )
+        assert rec_resp.status_code == 201
+        actions_before = client.get("/recall/actions").json()
+        assert len(actions_before) > 0
+
+        # 4. Reset via API endpoint
         reset_resp = client.post("/demo/reset")
         assert reset_resp.status_code == 200
         assert reset_resp.json()["status"] == "completed"
 
-        # 4. Verify post-reset state has 0 conflicts
+        # 5. Verify post-reset state has 0 conflicts and 0 RecallActions
         inv_clean = client.get("/investigate").json()
         assert len(inv_clean["all_conflicts"]) == 0
+        actions_after = client.get("/recall/actions").json()
+        assert len(actions_after) == 0
 
     finally:
         # Guarantee baseline reset
