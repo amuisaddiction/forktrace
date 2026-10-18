@@ -76,7 +76,7 @@ def health_check():
     if not is_ok:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"FalkorDB connection failed: {err_msg}",
+            detail=f"FalkorDB is unreachable: {err_msg}. Please check your database connection and environment credentials.",
         )
 
     g = get_graph()
@@ -107,6 +107,13 @@ def run_investigation():
     Identifies leading candidate, computes confidence, competing hypotheses, review scope,
     and simulated recall proposal.
     """
+    is_ok, err_msg = check_connection()
+    if not is_ok:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"FalkorDB is unreachable: {err_msg}. Investigation requires an active FalkorDB instance.",
+        )
+
     g = get_graph()
     try:
         report = investigate(graph=g)
@@ -158,7 +165,13 @@ def get_batch_evidence(batch_id: str):
 def demo_remove_shipment(payload: RemoveShipmentRequest):
     """Simulate missing shipment records (e.g. kitchen records exist without shipping log).
     Deletes the shipment between batch_id and place_id in FalkorDB.
+    Protected by DEMO_MODE environment variable.
     """
+    if not settings.demo_mode:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Demo endpoints are disabled (DEMO_MODE=false).",
+        )
     g = get_graph()
     deleted = remove_shipment(payload.batch_id, payload.place_id, graph=g)
     return RemoveShipmentResponse(
@@ -172,7 +185,14 @@ def demo_remove_shipment(payload: RemoveShipmentRequest):
 
 @api_router.post("/demo/reset", response_model=ResetResponse, summary="Restore Baseline Scenario")
 def demo_reset():
-    """Wipe and restore the FalkorDB graph to the pristine seeded scenario."""
+    """Wipe and restore the FalkorDB graph to the pristine seeded scenario.
+    Protected by DEMO_MODE environment variable.
+    """
+    if not settings.demo_mode:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Demo endpoints are disabled (DEMO_MODE=false).",
+        )
     g = get_graph()
     try:
         stats = reset(graph=g)

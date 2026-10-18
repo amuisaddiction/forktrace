@@ -142,3 +142,21 @@ def test_api_demo_mutation_and_reset(client: TestClient, scenario_data: dict, gr
         # Guarantee baseline reset
         reset(graph=graph)
 
+
+def test_api_demo_mode_disabled_blocks_mutations(client: TestClient):
+    """When DEMO_MODE is false, /demo/* mutation endpoints return 403 Forbidden."""
+    from app.config import settings
+    orig_demo = settings.demo_mode
+    try:
+        settings.demo_mode = False
+        resp = client.post("/demo/remove-shipment", json={"batch_id": "SP-2041", "place_id": "R3"})
+        assert resp.status_code == 403
+        assert "disabled" in resp.json()["detail"].lower()
+
+        reset_resp = client.post("/demo/reset")
+        assert reset_resp.status_code == 403
+        assert "disabled" in reset_resp.json()["detail"].lower()
+    finally:
+        settings.demo_mode = orig_demo
+
+

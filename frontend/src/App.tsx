@@ -71,6 +71,9 @@ export default function App() {
   };
 
   const handleRemoveShipment = async () => {
+    if (!window.confirm('Simulate missing shipment? This removes the SP-2041 → R3 shipment edge from FalkorDB to demonstrate conflict detection when kitchen records exist without shipping logs.')) {
+      return;
+    }
     try {
       setActionLoading(true);
       const res = await removeShipmentDemo('SP-2041', 'R3');
@@ -87,6 +90,9 @@ export default function App() {
   };
 
   const handleReset = async () => {
+    if (!window.confirm('Reset outbreak demo scenario? This will restore FalkorDB to the pristine seeded baseline scenario.')) {
+      return;
+    }
     try {
       setActionLoading(true);
       await resetDemo();
@@ -199,25 +205,9 @@ export default function App() {
         </div>
       )}
 
-      {/* Actions Toolbar */}
+      {/* Primary Actions Toolbar */}
       <div className="toolbar">
         <div className="btn-group">
-          <button
-            className="btn btn-danger"
-            onClick={handleRemoveShipment}
-            disabled={actionLoading}
-            title="Deletes the shipment edge between SP-2041 and R3 to demonstrate missing shipment audit detection"
-          >
-            Simulate Remove SP-2041 → R3 Shipment
-          </button>
-          <button
-            className="btn"
-            onClick={handleReset}
-            disabled={actionLoading}
-            title="Reloads scenario.json into FalkorDB"
-          >
-            Reset Demo Scenario
-          </button>
           <button
             className="btn btn-primary"
             onClick={handleApproveRecall}
@@ -237,6 +227,42 @@ export default function App() {
           <button className="btn" onClick={() => loadData(true)} disabled={actionLoading}>
             Refresh
           </button>
+        </div>
+      </div>
+
+      {/* Demo Controls Section */}
+      <div className="demo-controls-card">
+        <div className="demo-controls-header">
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '16px' }}>⚙️</span>
+              <span style={{ fontWeight: 600, fontSize: '14px', color: '#fbbf24' }}>Demo Controls (Simulation & Anomaly Testing)</span>
+              <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', fontSize: '11px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                Protected by DEMO_MODE
+              </span>
+            </div>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--text-muted)' }}>
+              Simulate supply chain anomalies (missing shipment logs) or restore graph to baseline. Requires confirmation.
+            </p>
+          </div>
+          <div className="btn-group">
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={handleRemoveShipment}
+              disabled={actionLoading}
+              title="Deletes the shipment edge between SP-2041 and R3 to demonstrate missing shipment conflict detection"
+            >
+              Simulate Remove SP-2041 → R3 Shipment
+            </button>
+            <button
+              className="btn btn-sm"
+              onClick={handleReset}
+              disabled={actionLoading}
+              title="Reloads scenario.json into FalkorDB"
+            >
+              Reset Demo Scenario
+            </button>
+          </div>
         </div>
       </div>
 

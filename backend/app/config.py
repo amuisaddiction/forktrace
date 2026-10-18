@@ -38,4 +38,7 @@ class Settings:
         self.low_lead_ratio: float = float(os.getenv("LOW_LEAD_RATIO", "1.2"))
         self.min_cases: int = int(os.getenv("MIN_CASES", "5"))
 
+        demo_val = os.getenv("DEMO_MODE", "true").strip().lower()
+        self.demo_mode: bool = demo_val in ("true", "1", "yes", "t")
+
 settings = Settings()
